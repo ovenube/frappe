@@ -188,7 +188,7 @@ class DbTable:
 			%sindex parent(parent),
 			index modified(modified))
 			ENGINE={engine}
-			ROW_FORMAT=COMPRESSED
+			ROW_FORMAT=DYNAMIC
 			CHARACTER SET=utf8mb4
 			COLLATE=utf8mb4_unicode_ci""".format(varchar_len=varchar_len,
 				engine=self.meta.get("engine") or 'InnoDB') % (self.name, add_text))
