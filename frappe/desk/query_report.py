@@ -58,7 +58,7 @@ def generate_report_result(report, filters=None, user=None):
 			status = "error"
 			frappe.msgprint(_("Must specify a Query to run"), raise_exception=True)
 
-		if not report.query.lower().startswith("select"):
+		if not report.query.lower().startswith("select") and not report.query.lower().startswith("(select"):
 			status = "error"
 			frappe.msgprint(_("Query must be a SELECT"), raise_exception=True)
 
