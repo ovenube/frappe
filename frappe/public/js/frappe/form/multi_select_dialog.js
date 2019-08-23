@@ -35,18 +35,38 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 		if(!this.date_field) {
 			this.date_field = "transaction_date";
 		}
-		Object.keys(this.setters).forEach(function(setter) {
-			fields.push({
-				fieldtype: me.target.fields_dict[setter].df.fieldtype,
-				label: me.target.fields_dict[setter].df.label,
-				fieldname: setter,
-				options: me.target.fields_dict[setter].df.options,
-				default: me.setters[setter]
-			});
-			if (count++ < Object.keys(me.setters).length) {
-				fields.push({fieldtype: "Column Break"});
+
+		// setters can be defined as a dict or a list of fields
+		// setters define the additional filters that get applied
+		// for selection
+
+		// CASE 1: DocType name and fieldname is the same, example "customer" and "customer"
+		// setters define the filters applied in the modal
+		// if the fieldnames and doctypes are consistently named,
+		// pass a dict with the setter key and value, for example
+		// {customer: [customer_name]}
+
+		// CASE 2: if the fieldname of the target is different,
+		// then pass a list of fields with appropriate fieldname
+
+		if($.isArray(this.setters)) {
+			for (let df of this.setters) {
+				fields.push(df, {fieldtype: "Column Break"});
 			}
-		});
+		} else {
+			Object.keys(this.setters).forEach(function(setter) {
+				fields.push({
+					fieldtype: me.target.fields_dict[setter].df.fieldtype,
+					label: me.target.fields_dict[setter].df.label,
+					fieldname: setter,
+					options: me.target.fields_dict[setter].df.options,
+					default: me.setters[setter]
+				});
+				if (count++ < Object.keys(me.setters).length) {
+					fields.push({fieldtype: "Column Break"});
+				}
+			});
+		}
 
 		fields = fields.concat([
 			{
@@ -67,7 +87,6 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 
 		let doctype_plural = !this.doctype.endsWith('y') ? this.doctype + 's'
 			: this.doctype.slice(0, -1) + 'ies';
-
 		this.dialog = new frappe.ui.Dialog({
 			title: __("Select {0}", [(this.doctype=='[Select]') ? __("value") : __(doctype_plural)]),
 			fields: fields,
@@ -80,10 +99,15 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 				// If user wants to close the modal
 				if (e) {
 					frappe.route_options = {};
-
-					Object.keys(me.setters).forEach(function(setter) {
-						frappe.route_options[setter] = me.dialog.fields_dict[setter].get_value() || undefined;
-					});
+					if($.isArray(me.setters)) {
+						for (let df of me.setters) {
+							frappe.route_options[df.fieldname] = me.dialog.fields_dict[df.fieldname].get_value() || undefined;
+						}
+					} else {
+						Object.keys(me.setters).forEach(function(setter) {
+							frappe.route_options[setter] = me.dialog.fields_dict[setter].get_value() || undefined;
+						});
+					}
 
 					frappe.new_doc(me.doctype, true);
 				}
@@ -132,6 +156,7 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 			clearTimeout($this.data('timeout'));
 			$this.data('timeout', setTimeout(function() {
 				frappe.flags.auto_scroll = false;
+				me.empty_list();
 				me.get_results();
 			}, 300));
 		});
@@ -151,7 +176,17 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 		let head = Object.keys(result).length === 0;
 
 		let contents = ``;
-		let columns = (["name"].concat(Object.keys(this.setters))).concat("Date");
+		let columns = ["name"];
+
+		if($.isArray(this.setters)) {
+			for (let df of this.setters) {
+				columns.push(df.fieldname);
+			}
+		} else {
+			columns = columns.concat(Object.keys(this.setters));
+		}
+		columns.push("Date");
+
 		columns.forEach(function(column) {
 			contents += `<div class="list-item__content ellipsis">
 				${
@@ -183,11 +218,11 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 
 		// Make empty result set if filter is set
 		if (!frappe.flags.auto_scroll) {
-			this.$results.empty();
+			this.empty_list();
 		}
 
 		if(results.length === 0) {
-			this.$results.empty();
+			this.empty_list();
 			more_btn.hide();
 			return;
 		} else if(more) {
@@ -203,14 +238,28 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 		}
 	},
 
+	empty_list: function() {
+		this.$results.find('.list-item-container').remove();
+	},
+
 	get_results: function() {
 		let me = this;
 
 		let filters = this.get_query ? this.get_query().filters : {};
-		Object.keys(this.setters).forEach(function(setter) {
-			filters[setter] = me.dialog.fields_dict[setter].get_value() || undefined;
-			me.args[setter] = filters[setter];
-		});
+		let filter_fields = [me.date_field];
+		if($.isArray(this.setters)) {
+			for (let df of this.setters) {
+				filters[df.fieldname] = me.dialog.fields_dict[df.fieldname].get_value() || undefined;
+				me.args[df.fieldname] = filters[df.fieldname];
+				filter_fields.push(df.fieldname);
+			}
+		} else {
+			Object.keys(this.setters).forEach(function(setter) {
+				filters[setter] = me.dialog.fields_dict[setter].get_value() || undefined;
+				me.args[setter] = filters[setter];
+				filter_fields.push(setter);
+			});
+		}
 
 		let date_val = this.dialog.fields_dict["date_range"].get_value();
 		if(date_val) {
@@ -221,7 +270,7 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 			doctype: me.doctype,
 			txt: me.dialog.fields_dict["search_term"].get_value(),
 			filters: filters,
-			filter_fields: Object.keys(me.setters).concat([me.date_field]),
+			filter_fields: filter_fields,
 			start: this.start,
 			page_length: this.page_length + 1,
 			query: this.get_query ? this.get_query().query : '',
@@ -256,7 +305,7 @@ frappe.ui.form.MultiSelectDialog = Class.extend({
 					});
 
 					// Preselect oldest entry
-					if (me.start < 1) {
+					if (me.start < 1 && r.values.length === 1) {
 						results[0].checked = 1;
 					}
 				}
