@@ -30,7 +30,10 @@ def get_form_params():
 	"""Stringify GET request parameters."""
 	data = frappe._dict(frappe.local.form_dict)
 
-	del data["cmd"]
+	data.pop('cmd', None)
+	data.pop('data', None)
+	data.pop('ignore_permissions', None)
+
 	if "csrf_token" in data:
 		del data["csrf_token"]
 
@@ -69,6 +72,7 @@ def get_form_params():
 
 	# queries must always be server side
 	data.query = None
+	data.strict = None
 
 	return data
 
@@ -185,6 +189,10 @@ def append_totals_row(data):
 		for i in range(len(row)):
 			if isinstance(row[i], (float, int)):
 				totals[i] = (totals[i] or 0) + row[i]
+
+	if not isinstance(totals[0], (int, float)):
+		totals[0] = 'Total'
+
 	data.append(totals)
 
 	return data
