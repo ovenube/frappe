@@ -18,4 +18,14 @@ def execute():
         if row.current:
             frappe.db.sql('insert into `tabSeries`(`name`, `current`) values (%(name)s, %(current)s)', row)
     frappe.db.commit()
-    frappe.db.sql('ALTER table `tabSeries` ADD PRIMARY KEY IF NOT EXISTS (name)')
+    if frappe.conf.db_type == 'mariadb':
+        frappe.db.sql('ALTER table `tabSeries` ADD PRIMARY KEY IF NOT EXISTS (name)')
+    elif frappe.conf.db_type == 'mysql':
+        key_count = frappe.db.sql('''SELECT COUNT(*) as key_count
+            FROM information_schema.statistics
+            WHERE TABLE_SCHEMA = DATABASE()
+            AND TABLE_NAME = 'tabSeries' 
+            AND INDEX_NAME = 'name'; ''', as_dict=True)
+        for row in key_count:
+            if row.key_count == 0:
+                frappe.db.sql('ALTER table `tabSeries` ADD INDEX (name)')
