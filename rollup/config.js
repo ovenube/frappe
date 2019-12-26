@@ -43,10 +43,6 @@ function get_rollup_options_for_js(output_file, input_files) {
 	);
 
 	const plugins = [
-		// Turn on vue production mode by using vue.min.js
-		production && replace({
-			'process.env.NODE_ENV': JSON.stringify( 'production' )
-			}),
 		// enables array of inputs
 		multi_entry(),
 		// .html -> .js
@@ -70,7 +66,11 @@ function get_rollup_options_for_js(output_file, input_files) {
 				paths: node_resolve_paths
 			}
 		}),
-		production && terser()
+		// Turn on vue production mode by using vue.min.js
+		production && replace({
+			'process.env.NODE_ENV': JSON.stringify( 'production' )
+		}),
+		production && terser(),
 	];
 
 	return {
