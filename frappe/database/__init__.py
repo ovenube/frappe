@@ -27,7 +27,7 @@ def drop_user_and_database(db_name, root_login=None, root_password=None):
 		return frappe.database.mariadb.setup_db.drop_user_and_database(db_name, root_login, root_password)
 	elif frappe.conf.db_type == 'mysql':
 		import frappe.database.mysql.setup_db
-		return frappe.database.mysql.setup_db.drop_user_and_database(db_name, root_login, root_password
+		return frappe.database.mysql.setup_db.drop_user_and_database(db_name, root_login, root_password)
 
 def get_db(host=None, user=None, password=None, port=None):
 	import frappe
