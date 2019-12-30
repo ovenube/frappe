@@ -152,7 +152,7 @@ def convert_to_dates(data, timegrain):
 def get_unit_function(datefield, timegrain):
 	unit_function = ''
 	if timegrain=='Daily':
-		if frappe.db.db_type == 'mariadb':
+		if frappe.db.db_type == 'mariadb' or frappe.db.db_type == 'mysql':
 			unit_function = 'dayofyear({})'.format(datefield)
 		else:
 			unit_function = 'extract(doy from {datefield})'.format(
