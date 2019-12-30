@@ -12,10 +12,10 @@ from frappe.utils import get_datetime, cstr
 from markdown2 import UnicodeWithAttrs
 from frappe.database.database import Database
 from six import PY2, binary_type, text_type, string_types
-from frappe.database.mysql.schema import mysqlTable
+from frappe.database.mysql.schema import MysqlTable
 
 
-class mysqlDatabase(Database):
+class MysqlDatabase(Database):
 	ProgrammingError = pymysql.err.ProgrammingError
 	TableMissingError = pymysql.err.ProgrammingError
 	OperationalError = pymysql.err.OperationalError
@@ -284,7 +284,7 @@ class mysqlDatabase(Database):
 			raise Exception('Wrong doctype {0} in updatedb'.format(doctype))
 
 		if not res[0][0]:
-			db_table = mysqlTable(doctype, meta)
+			db_table = MysqlTable(doctype, meta)
 			db_table.validate()
 
 			self.commit()
