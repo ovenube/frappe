@@ -390,7 +390,7 @@ def sync_value(value):
 				`published`=%(published)s,
 				`title`=%(title)s,
 				`route`=%(route)s
-		'''
+		''',
 	}, value)
 
 def delete_for_document(doc):
