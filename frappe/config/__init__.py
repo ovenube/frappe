@@ -29,6 +29,20 @@ def get_modules_from_all_apps_for_user(user=None):
 
 	return allowed_modules_list
 
+def get_modules_from_domains():
+	modules_list = []
+	active_domains = frappe.get_active_domains()
+
+	for active_domain in active_domains:
+		if active_domain != "":
+			domain_data = frappe.get_domain_data(active_domain)
+			module_domains = domain_data.get("modules")
+			if module_domains:
+				for module_domain in module_domains:
+					if module_domain not in modules_list:
+						modules_list.append(module_domain)
+	return modules_list
+
 def get_modules_from_all_apps():
 	modules_list = []
 	for app in frappe.get_installed_apps():
@@ -63,7 +77,7 @@ def get_modules_from_app(app):
 			module_name = m.get("module_name")
 
 			# Check Domain
-			if is_domain(m) and module_name not in active_domains:
+			if is_domain(m) and module_name not in active_domains and module_name not in get_modules_from_domains():
 				to_add = False
 
 			# Check if config
