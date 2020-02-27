@@ -11,7 +11,6 @@ const buble = require('rollup-plugin-buble');
 const { terser } = require('rollup-plugin-terser');
 const vue = require('rollup-plugin-vue');
 const frappe_html = require('./frappe-html-plugin');
-const replace = require('rollup-plugin-replace');
 
 const production = process.env.FRAPPE_ENV === 'production';
 
@@ -66,11 +65,7 @@ function get_rollup_options_for_js(output_file, input_files) {
 				paths: node_resolve_paths
 			}
 		}),
-		// Turn on vue production mode by using vue.min.js
-		production && replace({
-			'process.env.NODE_ENV': JSON.stringify( 'production' )
-		}),
-		production && terser(),
+		production && terser()
 	];
 
 	return {

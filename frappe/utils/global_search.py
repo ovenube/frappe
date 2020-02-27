@@ -81,6 +81,10 @@ def rebuild_for_doctype(doctype):
 		return filters
 
 	meta = frappe.get_meta(doctype)
+	
+	if cint(meta.issingle) == 1:
+		return
+	
 	if cint(meta.istable) == 1:
 		parent_doctypes = frappe.get_all("DocField", fields="parent", filters={
 			"fieldtype": ["in", frappe.model.table_fields],
@@ -390,7 +394,7 @@ def sync_value(value):
 				`published`=%(published)s,
 				`title`=%(title)s,
 				`route`=%(route)s
-		''',
+		'''
 	}, value)
 
 def delete_for_document(doc):

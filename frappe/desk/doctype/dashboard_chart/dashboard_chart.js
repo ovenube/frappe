@@ -113,15 +113,9 @@ frappe.ui.form.on('Dashboard Chart', {
 			} else {
 				// standard filters
 				if (frm.doc.document_type) {
-					// allow all link and select fields as filters
-					frm.chart_filters = [];
-					frappe.model.with_doctype(frm.doc.document_type, () => {
+						frm.chart_filters = [];
 						frappe.get_meta(frm.doc.document_type).fields.map(df => {
 							if (['Link', 'Select'].includes(df.fieldtype)) {
-								let _df = copy_dict(df);
-
-								// nothing is mandatory
-								_df.reqd = 0;
 								_df.default = null;
 								_df.depends_on = null;
 								_df.read_only = 0;
@@ -130,8 +124,8 @@ frappe.ui.form.on('Dashboard Chart', {
 
 								frm.chart_filters.push(_df);
 							}
-							frm.trigger('render_filters_table');
 						});
+						frm.trigger('render_filters_table');
 					});
 				}
 			}
@@ -157,7 +151,7 @@ frappe.ui.form.on('Dashboard Chart', {
 
 		let filters = JSON.parse(frm.doc.filters_json || '{}');
 		var filters_set = false;
-		fields.map( f => {
+		fields.map(f => {
 			if (filters[f.fieldname]) {
 				const filter_row = $(`<tr><td>${f.label}</td><td>${filters[f.fieldname] || ""}</td></tr>`);
 				table.find('tbody').append(filter_row);

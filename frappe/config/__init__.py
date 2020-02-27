@@ -104,7 +104,7 @@ def get_all_empty_tables_by_module():
 			SELECT "relname" as "table_name"
 			FROM "pg_stat_all_tables"
 			WHERE n_tup_ins = 0
-		""",
+		"""
 	}))
 
 	results = frappe.get_all("DocType", fields=["name", "module"])
