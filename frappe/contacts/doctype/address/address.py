@@ -78,6 +78,41 @@ class Address(Document):
 		return False
 
 @frappe.whitelist()
+def get_departments(country):
+		department_list = []
+		departments = frappe.get_list("Departamento", filters={"country": country}, fields=["department_name"], limit_page_length=100)
+		for department in departments:
+			department_list.append(department["department_name"])
+		return department_list
+
+@frappe.whitelist()
+def get_provinces(country, department):
+		province_list = []
+		department_list = frappe.get_list("Departamento", filters={"country": country, "department_name": department}, fields=["name"])
+		provinces = frappe.get_list("Provincia", filters={"department": department_list[0]["name"]}, fields=["province_name"])
+		for province in provinces:
+			province_list.append(province["province_name"])
+		return province_list
+
+@frappe.whitelist()
+def get_districts(country, department, province):
+		district_list = []
+		department_list = frappe.get_list("Departamento", filters={"country": country, "department_name": department}, fields=["name"])
+		province_list = frappe.get_list("Provincia", filters={"department": department_list[0]["name"], "province_name": province}, fields=["name"])
+		districts = frappe.get_list("Distrito", filters={"province": province_list[0]["name"]}, fields=["district_name"])
+		for district in districts:
+			district_list.append(district["district_name"])
+		return district_list
+
+@frappe.whitelist()
+def get_ubigeo(country, department, province, district):
+		district_list = []
+		department_list = frappe.get_list("Departamento", filters={"country": country, "department_name": department}, fields=["name"])
+		province_list = frappe.get_list("Provincia", filters={"department": department_list[0]["name"], "province_name": province}, fields=["name"])
+		district = frappe.get_list("Distrito", filters={"province": province_list[0]["name"], "district_name": district}, fields=["district_code"])
+		return district[0]['district_code']
+
+@frappe.whitelist()
 def get_default_address(doctype, name, sort_key='is_primary_address'):
 	'''Returns default Address name for the given doctype, name'''
 	if sort_key not in ['is_shipping_address', 'is_primary_address']:

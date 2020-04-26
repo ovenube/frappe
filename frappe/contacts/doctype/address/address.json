@@ -11,10 +11,13 @@
   "address_type",
   "address_line1",
   "address_line2",
-  "city",
-  "county",
-  "state",
   "country",
+  "state",
+  "county",
+  "city",
+  "departamento",
+  "provincia",
+  "distrito",
   "pincode",
   "column_break0",
   "email_id",
@@ -59,20 +62,22 @@
    "label": "Address Line 2"
   },
   {
+   "depends_on": "eval: doc.country != \"Peru\"",
    "fieldname": "city",
    "fieldtype": "Data",
    "in_global_search": 1,
    "in_list_view": 1,
    "label": "City/Town",
-   "reqd": 1,
    "search_index": 1
   },
   {
+   "depends_on": "eval: doc.country != \"Peru\"",
    "fieldname": "county",
    "fieldtype": "Data",
    "label": "County"
   },
   {
+   "depends_on": "eval: doc.country != \"Peru\"",
    "fieldname": "state",
    "fieldtype": "Data",
    "label": "State"
@@ -149,11 +154,29 @@
    "fieldtype": "Table",
    "label": "Links",
    "options": "Dynamic Link"
+  },
+  {
+   "depends_on": "eval: doc.country == \"Peru\"",
+   "fieldname": "departamento",
+   "fieldtype": "Select",
+   "label": "Departamento"
+  },
+  {
+   "depends_on": "eval: doc.country == \"Peru\"",
+   "fieldname": "provincia",
+   "fieldtype": "Select",
+   "label": "Provincia"
+  },
+  {
+   "depends_on": "eval: doc.country == \"Peru\"",
+   "fieldname": "distrito",
+   "fieldtype": "Select",
+   "label": "Distrito"
   }
  ],
  "icon": "fa fa-map-marker",
  "idx": 5,
- "modified": "2019-09-08 11:41:04.145589",
+ "modified": "2020-04-17 20:19:22.966159",
  "modified_by": "Administrator",
  "module": "Contacts",
  "name": "Address",

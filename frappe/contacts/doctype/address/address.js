@@ -2,7 +2,17 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Address", {
-	refresh: function(frm) {
+	refresh: function(frm, cdt, cdn) {
+		if(frm.doc.country == "Peru"){
+			frappe.db.get_list("Departamento", {fields: ["department_name"], filters: {country: frm.doc.country}, limit:1000}).then((result) => {
+				var departments = []
+				result.forEach(department => {
+					departments.push(department["department_name"]);
+				})
+				frappe.meta.get_docfield(cdt, 'departamento', frm.doc.name).options = departments.reverse();
+				frm.refresh_field("departamento");
+			})
+		}
 		if(frm.doc.__islocal) {
 			const last_doc = frappe.contacts.get_last_doc(frm);
 			if(frappe.dynamic_link && frappe.dynamic_link.doc
@@ -32,6 +42,84 @@ frappe.ui.form.on("Address", {
 					frappe.set_route("Form", link.link_doctype, link.link_name);
 				}, __("Links"));
 			}
+		}
+	},
+	country: function(frm, cdt, cdn){
+		if (frm.doc.country == "Peru"){
+			frappe.call({
+				method: "frappe.contacts.doctype.address.address.get_departments",
+				args: {
+					country: frm.doc.country
+				},
+				callback: function(r, rt){
+					if(r.message){
+						frappe.meta.get_docfield(cdt, 'departamento', frm.doc.name).options = r.message.reverse();
+						frappe.meta.get_docfield(cdt, 'provincia', frm.doc.name).options = [];
+						frappe.meta.get_docfield(cdt, 'distrito', frm.doc.name).options = [];
+						frm.set_value("ubigeo", "");
+						frm.refresh_field("departamento");
+						frm.refresh_field("provincia");
+						frm.refresh_field("distrito");
+					}
+				}
+			})
+		}
+	},
+	departamento: function(frm, cdt, cdn){
+		if (frm.doc.country == "Peru"){
+			frappe.call({
+				method: "frappe.contacts.doctype.address.address.get_provinces",
+				args: {
+					country: frm.doc.country,
+					department: frm.doc.departamento
+				},
+				callback: function(r, rt){
+					if(r.message){
+						frappe.meta.get_docfield(cdt, 'provincia', frm.doc.name).options = r.message;
+						frappe.meta.get_docfield(cdt, 'distrito', frm.doc.name).options = [];
+						frm.set_value("ubigeo", "");
+						frm.refresh_field("provincia");
+						frm.refresh_field("distrito");
+					}
+				}
+			})
+		}
+	},
+	provincia: function(frm, cdt, cdn){
+		if (frm.doc.country == "Peru"){
+			frappe.call({
+				method: "frappe.contacts.doctype.address.address.get_districts",
+				args: {
+					country: frm.doc.country,
+					department: frm.doc.departamento,
+					province: frm.doc.provincia
+				},
+				callback: function(r, rt){
+					if(r.message){
+						frappe.meta.get_docfield(cdt, 'distrito', frm.doc.name).options = r.message;
+						frm.set_value("ubigeo", "");
+						frm.refresh_field("distrito");
+					}
+				}
+			})
+		}		
+	},
+	distrito: function(frm, cdt, cdn){
+		if (frm.doc.country == "Peru"){
+			frappe.call({
+				method: "frappe.contacts.doctype.address.address.get_ubigeo",
+				args: {
+					country: frm.doc.country,
+					department: frm.doc.departamento,
+					province: frm.doc.provincia,
+					district: frm.doc.distrito
+				},
+				callback: function(r, rt){
+					if (r.message){
+						frm.set_value("ubigeo", r.message);
+					}
+				}
+			})
 		}
 	},
 	validate: function(frm) {

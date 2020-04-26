@@ -1,0 +1,72 @@
+{
+ "allow_import": 1,
+ "autoname": "PRO.#####",
+ "creation": "2020-04-17 20:12:59.752887",
+ "doctype": "DocType",
+ "document_type": "Setup",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "province_name",
+  "department",
+  "province_code"
+ ],
+ "fields": [
+  {
+   "fieldname": "province_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Province",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Departamento",
+   "reqd": 1
+  },
+  {
+   "fieldname": "province_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "code",
+   "reqd": 1
+  }
+ ],
+ "modified": "2020-04-17 20:15:53.269619",
+ "modified_by": "Administrator",
+ "module": "Geo",
+ "name": "Provincia",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "province_name",
+ "track_changes": 1
+}
