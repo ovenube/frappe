@@ -197,6 +197,7 @@ CREATE TABLE `tabSessions` (
   `lastupdate` datetime(6) DEFAULT NULL,
   `device` varchar(255) DEFAULT 'desktop',
   `status` varchar(20) DEFAULT NULL,
+  `cart_id` varchar(255) DEFAULT NULL,
   KEY `sid` (`sid`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
