@@ -1,8 +1,8 @@
 // Frappe Chat
 // Author - Achilles Rasquinha <achilles@frappe.io>
 
-import Fuse   from 'fuse.js'
-import hyper  from '../lib/hyper.min'
+import Fuse from 'fuse.js'
+import hyper from '../lib/hyper.min'
 
 import './socketio_client'
 
@@ -177,7 +177,7 @@ frappe.datetime.compare = (a, b) => {
 }
 
 // frappe.quick_edit
-frappe.quick_edit      = (doctype, docname, fn) => {
+frappe.quick_edit = (doctype, docname, fn) => {
 	return new Promise(resolve => {
 		frappe.model.with_doctype(doctype, () => {
 			frappe.db.get_doc(doctype, docname).then(doc  => {
@@ -1085,7 +1085,7 @@ frappe.chat.website.settings = (fields, fn) =>
 	})
 }
 
-frappe.chat.website.token    = (fn) =>
+frappe.chat.website.token = (fn) =>
 {
 	return new Promise(resolve => {
 		frappe.call("frappe.chat.website.token")
@@ -2686,7 +2686,7 @@ frappe.chat.render = (render = true, force = false) =>
 		if ( render ) {
 			if ( frappe.session.user === 'Guest' && !desk ) {
 				frappe.store = frappe.Store.get('frappe.chat')
-				var token	 = frappe.store.get('guest_token')
+				var token = frappe.store.get('guest_token')
 
 				frappe.log.info(`Local Guest Token - ${token}`)
 
@@ -2730,8 +2730,8 @@ frappe.chat.render = (render = true, force = false) =>
 	}
 }
 
-frappe.chat.setup  = () => {
-	frappe.log     = frappe.Logger.get('frappe.chat')
+frappe.chat.setup = () => {
+	frappe.log = frappe.Logger.get('frappe.chat')
 
 	frappe.log.info('Setting up frappe.chat')
 	frappe.log.warn('TODO: frappe.chat.<object> requires a storage.')
@@ -2770,7 +2770,7 @@ frappe.chat.setup  = () => {
 				if ( settings.enable_from && settings.enable_to ) {
 					frappe.log.info(`Enabling Chat Schedule - ${settings.enable_from.format()} : ${settings.enable_to.format()}`)
 
-					const range   = new frappe.datetime.range(settings.enable_from, settings.enable_to)
+					const range = new frappe.datetime.range(settings.enable_from, settings.enable_to)
 					should_render = range.contains(frappe.datetime.now())
 				}
 

@@ -202,29 +202,27 @@ class Session:
 		# generate sid
 		if self.user=='Guest':
 			sid = 'Guest'
-			cart_id = frappe.generate_hash()
 		else:
 			sid = frappe.generate_hash()
-			cart_id = None
 
 		self.data.user = self.user
 		self.data.sid = sid
 		self.data.data.user = self.user
 		self.data.data.session_ip = frappe.local.request_ip
-		self.data.cart_id = cart_id
-		self.data.data.update({
-			"last_updated": frappe.utils.now(),
-			"session_expiry": get_expiry_period(self.device),
-			"full_name": self.full_name,
-			"user_type": self.user_type,
-			"device": self.device,
-			"session_country": get_geo_ip_country(frappe.local.request_ip) if frappe.local.request_ip else None,
-			"cart_id": cart_id
-		})
+		if self.user != "Guest":
+			self.data.data.update({
+				"last_updated": frappe.utils.now(),
+				"session_expiry": get_expiry_period(self.device),
+				"full_name": self.full_name,
+				"user_type": self.user_type,
+				"device": self.device,
+				"session_country": get_geo_ip_country(frappe.local.request_ip) if frappe.local.request_ip else None,
+			})
 
 		# insert session
-		self.insert_session_record()
 		if self.user!="Guest":
+			self.insert_session_record()
+
 			# update user
 			user = frappe.get_doc("User", self.data['user'])
 			frappe.db.sql("""UPDATE `tabUser`
@@ -243,15 +241,12 @@ class Session:
 
 	def insert_session_record(self):
 		frappe.db.sql("""insert into `tabSessions`
-			(`sessiondata`, `user`, `lastupdate`, `sid`, `status`, `device`, `cart_id`)
+			(`sessiondata`, `user`, `lastupdate`, `sid`, `status`, `device`)
 			values (%s , %s, NOW(), %s, 'Active', %s)""",
-				(str(self.data['data']), self.data['user'], self.data['sid'], self.device, self.cart_id))
+				(str(self.data['data']), self.data['user'], self.data['sid'], self.device))
 
 		# also add to memcache
-		if self.data.sid == "Guest":
-			frappe.cache().hset("session", self.data.cart_id, self.data)
-		else:
-			frappe.cache().hset("session", self.data.sid, self.data)
+		frappe.cache().hset("session", self.data.sid, self.data)
 
 	def resume(self):
 		"""non-login request: load a session"""
@@ -261,7 +256,7 @@ class Session:
 
 		if data:
 			# set language
-			self.data.update({'data': data, 'user':data.user, 'sid': self.sid, 'cart_id': self.cart_id})
+			self.data.update({'data': data, 'user':data.user, 'sid': self.sid})
 			self.user = data.user
 			validate_ip_address(self.user)
 			self.device = data.device
@@ -286,13 +281,16 @@ class Session:
 		return r
 
 	def get_session_data(self):
+		if self.sid=="Guest":
+			return frappe._dict({"user":"Guest"})
+
 		data = self.get_session_data_from_cache()
 		if not data:
 			data = self.get_session_data_from_db()
 		return data
 
 	def get_session_data_from_cache(self):
-		data = frappe.cache().hget("session", self.sid if self.sid!="Guest" else self.cart_id)
+		data = frappe.cache().hget("session", self.sid)
 		if data:
 			data = frappe._dict(data)
 			session_data = data.get("data", {})
@@ -310,24 +308,14 @@ class Session:
 		return data and data.data
 
 	def get_session_data_from_db(self):
-		if self.sid == "Guest":
-			self.device = frappe.db.sql('SELECT `device` FROM `tabSessions` WHERE `cart_id`=%s', self.cart_id)
-		else:
-			self.device = frappe.db.sql('SELECT `device` FROM `tabSessions` WHERE `sid`=%s', self.sid)
+		self.device = frappe.db.sql('SELECT `device` FROM `tabSessions` WHERE `sid`=%s', self.sid)
 		self.device = self.device and self.device[0][0] or 'desktop'
 
-		if self.sid == "Guest":
-			rec = frappe.db.sql("""
+		rec = frappe.db.sql("""
 			SELECT `user`, `sessiondata`
-			FROM `tabSessions` WHERE `cart_id`=%s AND
+			FROM `tabSessions` WHERE `sid`=%s AND
 			(NOW() - lastupdate) < %s
-			""", (self.cart_id, get_expiry_period_for_query(self.device)))
-		else:
-			rec = frappe.db.sql("""
-				SELECT `user`, `sessiondata`
-				FROM `tabSessions` WHERE `sid`=%s AND
-				(NOW() - lastupdate) < %s
-				""", (self.sid, get_expiry_period_for_query(self.device)))
+			""", (self.sid, get_expiry_period_for_query(self.device)))
 
 		if rec:
 			data = frappe._dict(eval(rec and rec[0][1] or '{}'))
@@ -348,7 +336,7 @@ class Session:
 
 	def update(self, force=False):
 		"""extend session expiry"""
-		if frappe.form_dict.cmd=="logout":
+		if (frappe.session['user'] == "Guest" or frappe.form_dict.cmd=="logout"):
 			return
 
 		now = frappe.utils.now()
@@ -357,35 +345,30 @@ class Session:
 		self.data['data']['lang'] = text_type(frappe.lang)
 
 		# update session in db
-		last_updated = frappe.cache().hget("last_db_session_update", self.sid if self.sid!="Guest" else self.cart_id)
+		last_updated = frappe.cache().hget("last_db_session_update", self.sid)
 		time_diff = frappe.utils.time_diff_in_seconds(now, last_updated) if last_updated else None
 
 		# database persistence is secondary, don't update it too often
 		updated_in_db = False
 		if force or (time_diff==None) or (time_diff > 600):
 			# update sessions table
-			if self.data['sid'] == "Guest":
-				frappe.db.sql("""update `tabSessions` set sessiondata=%s,
-					lastupdate=NOW() where cart_id=%s""" , (str(self.data['data']),
-					self.data['cart_id']))
-			else:
-				frappe.db.sql("""update `tabSessions` set sessiondata=%s,
-					lastupdate=NOW() where sid=%s""" , (str(self.data['data']),
-					self.data['sid']))
+			frappe.db.sql("""update `tabSessions` set sessiondata=%s,
+				lastupdate=NOW() where sid=%s""" , (str(self.data['data']),
+				self.data['sid']))
 
-				# update last active in user table
-				frappe.db.sql("""update `tabUser` set last_active=%(now)s where name=%(name)s""", {
-					"now": now,
-					"name": frappe.session.user
-				})
+			# update last active in user table
+			frappe.db.sql("""update `tabUser` set last_active=%(now)s where name=%(name)s""", {
+				"now": now,
+				"name": frappe.session.user
+			})
 
 			frappe.db.commit()
-			frappe.cache().hset("last_db_session_update", self.sid if self.sid!="Guest" else self.cart_id, now)
+			frappe.cache().hset("last_db_session_update", self.sid, now)
 
 			updated_in_db = True
 
 		# set in memcache
-		frappe.cache().hset("session", self.sid if self.sid!="Guest" else self.cart_id, self.data)
+		frappe.cache().hset("session", self.sid, self.data)
 
 		return updated_in_db
 
