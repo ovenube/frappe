@@ -468,4 +468,15 @@ frappe.ready(function() {
 		}
 	});
 	frappe.socketio.init(window.socketio_port);
+
+	frappe.call({
+		"method": "erpnext.shopping_cart.doctype.shopping_cart_settings.shopping_cart_settings.is_guest_orders_allowed",
+		callback: (r) => {
+			if (r.message) {
+				frappe.require('/assets/js/erpnext-web.min.js', () => {
+					erpnext.shopping_cart.setup();
+				})
+			}
+		}
+	})
 });
