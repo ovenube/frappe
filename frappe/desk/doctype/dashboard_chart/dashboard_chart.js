@@ -113,9 +113,14 @@ frappe.ui.form.on('Dashboard Chart', {
 			} else {
 				// standard filters
 				if (frm.doc.document_type) {
+					frappe.model.with_doctype(frm.doc.document_type, () => {
 						frm.chart_filters = [];
 						frappe.get_meta(frm.doc.document_type).fields.map(df => {
 							if (['Link', 'Select'].includes(df.fieldtype)) {
+								let _df = copy_dict(df);
+
+								// nothing is mandatory
+								_df.reqd = 0;
 								_df.default = null;
 								_df.depends_on = null;
 								_df.read_only = 0;
@@ -185,5 +190,4 @@ frappe.ui.form.on('Dashboard Chart', {
 		});
 	}
 });
-
 
