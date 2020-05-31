@@ -602,7 +602,7 @@
  "idx": 413,
  "image_field": "user_image",
  "max_attachments": 5,
- "modified": "2019-10-22 14:16:34.810223",
+ "modified": "2020-05-31 14:16:34.810223",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
