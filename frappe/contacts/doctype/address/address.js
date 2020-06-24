@@ -11,7 +11,39 @@ frappe.ui.form.on("Address", {
 				})
 				frappe.meta.get_docfield(cdt, 'departamento', frm.doc.name).options = departments.reverse();
 				frm.refresh_field("departamento");
+				if (frm.doc.departamento){
+					frappe.call({
+						method: "frappe.contacts.doctype.address.address.get_provinces",
+						args: {
+							country: frm.doc.country,
+							department: frm.doc.departamento
+						},
+						callback: function(r, rt){
+							if(r.message){
+								frappe.meta.get_docfield(cdt, 'provincia', frm.doc.name).options = r.message;
+								frm.refresh_field("provincia");
+							}
+						}
+					});
+				}
+				if (frm.doc.provincia){
+					frappe.call({
+						method: "frappe.contacts.doctype.address.address.get_districts",
+						args: {
+							country: frm.doc.country,
+							department: frm.doc.departamento,
+							province: frm.doc.provincia
+						},
+						callback: function(r, rt){
+							if(r.message){
+								frappe.meta.get_docfield(cdt, 'distrito', frm.doc.name).options = r.message;
+								frm.refresh_field("distrito");
+							}
+						}
+					});
+				}
 			})
+			
 		}
 		if(frm.doc.__islocal) {
 			const last_doc = frappe.contacts.get_last_doc(frm);
