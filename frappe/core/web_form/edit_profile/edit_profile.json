@@ -9,6 +9,7 @@
  "amount": 0.0,
  "amount_based_on_field": 0,
  "breadcrumbs": "[{\"title\": _(\"My Account\"), \"route\": \"me\"}]",
+ "client_script": "",
  "creation": "2016-09-19 05:16:59.242754",
  "doc_type": "User",
  "docstatus": 0,
@@ -18,7 +19,7 @@
  "is_standard": 1,
  "login_required": 1,
  "max_attachment_size": 0,
- "modified": "2020-05-31 19:04:14.486406",
+ "modified": "2020-07-06 11:07:44.644496",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "edit-profile",
@@ -85,6 +86,7 @@
   },
   {
    "allow_read_on_all_link_options": 0,
+   "depends_on": "",
    "fieldname": "tax_id",
    "fieldtype": "Data",
    "hidden": 0,
@@ -93,6 +95,19 @@
    "max_value": 0,
    "read_only": 0,
    "reqd": 1,
+   "show_in_filter": 0
+  },
+  {
+   "allow_read_on_all_link_options": 0,
+   "depends_on": "eval: doc.tipo_documento_identidad == \"REGISTRO \u00daNICO DE CONTRIBUYENTES\"",
+   "fieldname": "business_name",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Business Name",
+   "max_length": 0,
+   "max_value": 0,
+   "read_only": 0,
+   "reqd": 0,
    "show_in_filter": 0
   },
   {
@@ -121,6 +136,7 @@
   },
   {
    "allow_read_on_all_link_options": 0,
+   "depends_on": "",
    "fieldname": "phone",
    "fieldtype": "Data",
    "hidden": 0,

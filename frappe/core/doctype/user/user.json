@@ -16,6 +16,7 @@
   "full_name",
   "tipo_documento_identidad",
   "tax_id",
+  "business_name",
   "send_welcome_email",
   "unsubscribed",
   "column_break0",
@@ -141,19 +142,18 @@
    "read_only": 1
   },
   {
-    "fieldname": "tipo_documento_identidad",
-    "fieldtype": "Link",
-    "label": "Tipo Documento Identidad",
-    "options": "Tipos de Documento de Identidad"
+   "fieldname": "tipo_documento_identidad",
+   "fieldtype": "Link",
+   "label": "Tipo Documento Identidad",
+   "options": "Tipos de Documento de Identidad"
   },
   {
-    "fieldname": "tax_id",
-    "fieldtype": "Data",
-    "in_global_search": 1,
-    "in_standard_filter": 1,
-    "label": "Tax ID",
-    "read_only": 0
-   },
+   "fieldname": "tax_id",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_standard_filter": 1,
+   "label": "Tax ID"
+  },
   {
    "bold": 1,
    "default": "1",
@@ -596,13 +596,19 @@
    "fieldtype": "Password",
    "label": "API Secret",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval: doc.tipo_documento_identidad == \"REGISTRO \u00daNICO DE CONTRIBUYENTES\"",
+   "fieldname": "business_name",
+   "fieldtype": "Data",
+   "label": "Business Name"
   }
  ],
  "icon": "fa fa-user",
  "idx": 413,
  "image_field": "user_image",
  "max_attachments": 5,
- "modified": "2020-05-31 14:16:34.810223",
+ "modified": "2020-07-06 11:05:53.280012",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
