@@ -9,6 +9,11 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
+					"name": "Culqi Settings",
+					"description": _("Culqi payment gateway settings"),
+				},
+				{
+					"type": "doctype",
 					"name": "Braintree Settings",
 					"description": _("Braintree payment gateway settings"),
 				},

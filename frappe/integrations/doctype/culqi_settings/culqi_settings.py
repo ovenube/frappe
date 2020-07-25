@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
-from frappe.integrations.utils import create_payment_gateway, make_get_request, create_request_log
+from frappe.integrations.utils import create_payment_gateway, make_get_request, make_post_request, create_request_log
 from frappe.utils import call_hook_method, get_url
 from frappe import _
 
