@@ -11,7 +11,8 @@
   "api_secret",
   "enable_multipayments",
   "max_order_duration_time",
-  "url_webhook"
+  "url_webhook",
+  "enable_electronic_invoice"
  ],
  "fields": [
   {
@@ -57,11 +58,17 @@
    "fieldtype": "Data",
    "label": "Store Description",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_electronic_invoice",
+   "fieldtype": "Check",
+   "label": "Enable electrocin invoice"
   }
  ],
  "in_create": 1,
  "issingle": 1,
- "modified": "2020-07-05 16:01:43.971664",
+ "modified": "2020-07-27 10:22:03.878625",
  "modified_by": "Administrator",
  "module": "Integrations",
  "name": "Culqi Settings",
