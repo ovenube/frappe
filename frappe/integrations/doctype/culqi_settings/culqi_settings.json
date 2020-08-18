@@ -63,12 +63,12 @@
    "default": "0",
    "fieldname": "enable_electronic_invoice",
    "fieldtype": "Check",
-   "label": "Enable electrocin invoice"
+   "label": "Enable electronic invoice"
   }
  ],
  "in_create": 1,
  "issingle": 1,
- "modified": "2020-07-27 10:22:03.878625",
+ "modified": "2020-08-07 05:54:06.369954",
  "modified_by": "Administrator",
  "module": "Integrations",
  "name": "Culqi Settings",
