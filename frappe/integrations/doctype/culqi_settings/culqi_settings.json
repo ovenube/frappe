@@ -1,10 +1,12 @@
 {
- "creation": "2020-07-05 11:50:08.981420",
+ "autoname": "field:company",
+ "creation": "2020-08-25 10:57:16.749422",
  "doctype": "DocType",
  "document_type": "System",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "store_name",
   "store_description",
   "api_key",
@@ -15,6 +17,26 @@
   "enable_electronic_invoice"
  ],
  "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "store_name",
+   "fieldtype": "Data",
+   "label": "Store Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "store_description",
+   "fieldtype": "Data",
+   "label": "Store Description",
+   "reqd": 1
+  },
   {
    "fieldname": "api_key",
    "fieldtype": "Data",
@@ -48,27 +70,13 @@
    "label": "URL webhook"
   },
   {
-   "fieldname": "store_name",
-   "fieldtype": "Data",
-   "label": "Store Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "store_description",
-   "fieldtype": "Data",
-   "label": "Store Description",
-   "reqd": 1
-  },
-  {
    "default": "0",
    "fieldname": "enable_electronic_invoice",
    "fieldtype": "Check",
-   "label": "Enable electronic invoice"
+   "label": "Enable Electronic Invoice"
   }
  ],
- "in_create": 1,
- "issingle": 1,
- "modified": "2020-08-07 05:54:06.369954",
+ "modified": "2020-08-25 11:04:43.849143",
  "modified_by": "Administrator",
  "module": "Integrations",
  "name": "Culqi Settings",
@@ -86,8 +94,8 @@
    "write": 1
   }
  ],
- "read_only": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "title_field": "company",
  "track_changes": 1
 }

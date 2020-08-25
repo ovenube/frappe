@@ -69,8 +69,8 @@ def get_express_checkout_details(**args):
 	args = frappe._dict(args)
 	custom_redirect_to = None
 	try:
-		doc = frappe.get_doc("Culqi Settings")
 		pr_info = frappe.cache().hget("payment_request", frappe.session.sid)
+		doc = frappe.get_doc("Culqi Settings", pr_info['company'])
 		headers, url = doc.get_culqi_headers_and_url(key_type="private")
 
 		charge_data = {
