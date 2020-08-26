@@ -14,11 +14,12 @@ import requests
 from six.moves.urllib.parse import urlencode
 
 class CulqiSettings(Document):
-	supported_currencies = ["USD", "PEN"]
+	supported_currencies = ["USD", "PEN", "SOL"]
 
 	def validate(self):
-		create_payment_gateway("Culqi")
-		call_hook_method('payment_gateway_enabled', gateway="Culqi")
+		payment_gateway_name = "Culqi - " + self.company
+		create_payment_gateway(payment_gateway_name)
+		call_hook_method('payment_gateway_enabled', gateway=payment_gateway_name)
 		if not self.flags.ignore_mandatory:
 			self.validate_culqi_credentails() 
 
