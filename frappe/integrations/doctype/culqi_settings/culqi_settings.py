@@ -36,7 +36,7 @@ class CulqiSettings(Document):
 			"card_number": "4111111111111111",
 			"cvv": "123",
 			"expiration_month": "09",
-			"expiration_year": "2020",
+			"expiration_year": "2025",
 			"email": "richard@piedpiper.com"
 		}
 		try:
@@ -48,8 +48,8 @@ class CulqiSettings(Document):
 			sk_response = make_get_request(api_url + "tokens", headers=sk_headers)
 			if not sk_response["data"]:
 				raise Exception
-		except Exception:
-			frappe.throw(_("Invalid payment gateway credentials"))
+		except Exception as e:
+			frappe.throw(_("Invalid payment gateway credentials. {}".format(e)))
 	
 	def get_payment_settings(self, **kwargs):
 		if kwargs['reference_docname']:
